@@ -1,22 +1,13 @@
-# database/db_connection.py
-import sqlite3
-from sqlite3 import Connection
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-def get_db_connection() -> Connection:
-    """Establece y retorna la conexión a la base de datos."""
-    connection = sqlite3.connect("dna_records.db")
-    connection.row_factory = sqlite3.Row  # Permite acceder a las columnas por nombre
-    return connection
+DATABASE_URL = "sqlite:///./adn_database.db" 
 
-def initialize_database():
-    """Inicializa la base de datos creando las tablas necesarias."""
-    connection = get_db_connection()
-    with connection:
-        connection.execute("""
-            CREATE TABLE IF NOT EXISTS dna_records (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                dna_sequence TEXT UNIQUE,
-                is_mutant BOOLEAN
-            )
-        """)
-    connection.close()
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+
+
+Base = declarative_base()
+
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
